@@ -74,7 +74,8 @@
                     font-size 12px
                 .support
                     .icon
-                        display inline-block
+                        display: inline-block
+                        vertical-align top
                         width: 12px
                         height: 12px
                         margin-right: 4px
@@ -90,4 +91,8 @@
                             bg-image('invoice_1')
                         &.special
                             bg-image('special_1')
+                    .text
+                        vertical-align top
+                        line-height: 12px
+                        font-size: 12px
 </style>
