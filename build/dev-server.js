@@ -32,14 +32,14 @@ apiRoutes.get('/seller', function (req, res) {
 
 apiRoutes.get('/goods', function (req, res) {
   res.json({
-    error: 0,
+    errno: 0,
     data: goods
   });
 });
 
 apiRoutes.get('/ratings', function (req, res) {
   res.json({
-    error: 0,
+    errno: 0,
     data: ratings
   });
 });

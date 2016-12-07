@@ -25,10 +25,8 @@
     created() {
       this.$http.get('/api/seller').then((response) => {
         response = response.body
-        console.log(response)
         if (response.errno === ERR_OK) {
           this.seller = response.data
-          console.log(this.seller)
         }
       })
     },
