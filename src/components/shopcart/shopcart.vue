@@ -21,67 +21,79 @@
                 </div>
             </div>
         </div>
+        <div class="ball-container">
+            <transition v-for="ball in balls" v-show="ball.show" class="ball">
+                <div class="inner"></div>
+            </transition>
+        </div>
     </div>
 </template>
 
 <script type="text/ecmascript-6">
-  export default {
-    props: {
-    	selectFoods: {
-    		type: Array,
-            default() {
-    			return [
-                    {
-                    	price: 10,
-                        count: 10
-                    }
+    export default {
+        props: {
+            selectFoods: {
+                type: Array,
+                default() {
+                    return []
+                }
+            },
+            deliveryPrice: {
+                type: Number,
+                default: 0
+            },
+            minPrice: {
+                type: Number,
+                default: 0
+            }
+        },
+
+        data() {
+        	return {
+        		balls: [
+        			{show: false},
+        			{show: false},
+        			{show: false},
+        			{show: false},
+        			{show: false}
                 ]
             }
         },
-    	deliveryPrice: {
-    		type: Number,
-            default: 0
-        },
-        minPrice: {
-        	type: Number,
-            default: 0
-        }
-    },
 
-    computed: {
-    	totalPrice() {
-    		let total = 0
-            this.selectFoods.forEach((food) => {
-            	total += food.price * food.count
-            })
-            return total
-        },
-        totalCount() {
-        	let count = 0
-            this.selectFoods.forEach((food) => {
-            	count += food.count
-            })
-            return count
-        },
-        payDesc() {
-        	if (this.totalPrice === 0) {
-        		return `￥${this.minPrice}元起送`
-            } else if (this.totalPrice < this.minPrice) {
-            	let diff = this.minPrice - this.totalPrice
-            	return `还差${diff}元起送`
-            } else {
-            	return '去结算'
-            }
-        },
-        payClass() {
-        	if (this.totalPrice < this.minPrice) {
-        		return 'not-enough'
-            } else {
-            	return 'enough'
+        computed: {
+            totalPrice() {
+                let total = 0
+                this.selectFoods.forEach((food) => {
+                    total += food.price * food.count
+                })
+                return total
+            },
+            totalCount() {
+                let count = 0
+                this.selectFoods.forEach((food) => {
+                    count += food.count
+                })
+                return count
+            },
+            payDesc() {
+                if (this.totalPrice === 0) {
+                    return `￥${this.minPrice}元起送`
+                } else if (this.totalPrice < this.minPrice) {
+                    let diff = this.minPrice - this.totalPrice
+                    return `还差${diff}元起送`
+                } else {
+                    return '去结算'
+                }
+            },
+            payClass() {
+                if (this.totalPrice < this.minPrice) {
+                    return 'not-enough'
+                } else {
+                    return 'enough'
+                }
             }
         }
     }
-  }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
@@ -170,4 +182,15 @@
                     &.enough
                         background #00b43c
                         color #fff
+        .ball-container
+            .ball
+                position fixed
+                left 32px
+                bottom 22px
+                z-index 200px
+                .inner
+                    width 16px
+                    height 16px
+                    border-radius 50%
+                    background rgb(0, 160, 220)
 </style>

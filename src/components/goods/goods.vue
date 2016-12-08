@@ -2,7 +2,8 @@
     <div class="goods">
         <div class="menu-wrapper" ref="menuWrapper">
             <ul>
-                <li class="menu-item" v-for="(item, index) in goods" :class="{'current': currentIndex === index}" @click="selectMenu(index, $event)">
+                <li class="menu-item" v-for="(item, index) in goods" :class="{'current': currentIndex === index}"
+                    @click="selectMenu(index, $event)">
                     <span class="text border-1px">
                         <span v-show="item.type>0" class="icon" :class="classMap[item.type]"></span>{{item.name}}</span>
                 </li>
@@ -36,7 +37,7 @@
                 </li>
             </ul>
         </div>
-        <shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
+        <shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
     </div>
 </template>
 
@@ -47,85 +48,96 @@
     const ERR_OK = 0
 
     export default {
-      props: {
-        seller: {
-            type: Object
-        }
-      },
+        props: {
+            seller: {
+                type: Object
+            }
+        },
 
-      data() {
-      	return {
-      	  goods: [],
-          listHeight: [],
-          scrollY: 0
-        }
-      },
+        data() {
+            return {
+                goods: [],
+                listHeight: [],
+                scrollY: 0
+            }
+        },
 
-      computed: {
-      	currentIndex() {
-      		for (let i = 0; i < this.listHeight.length; i++) {
-      			let height1 = this.listHeight[i]
-      			let height2 = this.listHeight[i + 1]
-                if (!height2 || (this.scrollY >= height1 && this.scrollY < height2)) {
-      				return i
+        computed: {
+            currentIndex() {
+                for (let i = 0; i < this.listHeight.length; i++) {
+                    let height1 = this.listHeight[i]
+                    let height2 = this.listHeight[i + 1]
+                    if (!height2 || (this.scrollY >= height1 && this.scrollY < height2)) {
+                        return i
+                    }
                 }
+            },
+            selectFoods() {
+            	let foods = []
+                this.goods.forEach((good) => {
+                	good.foods.forEach((food) => {
+                		if (food.count) {
+                			foods.push(food)
+                        }
+                    })
+                })
+                return foods
             }
-        }
-      },
+        },
 
-      created() {
-          this.classMap = ['decrease', 'discount', 'guarantee', 'invoice', 'special']
-          this.$http.get('/api/goods').then((response) => {
-              response = response.body
-              console.log(response)
-              if (response.errno === ERR_OK) {
-                  this.goods = response.data
-                  this.$nextTick(() => {
-                      this._initScroll()
-                      this._calculateHeight()
-                  })
-              }
-          })
-      },
-
-      methods: {
-      	_initScroll() {
-      		this.menuScroll = new BScroll(this.$refs.menuWrapper, {
-      			click: true
-            })
-      		this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
-                click: true,
-                probeType: 3
-            })
-            this.foodsScroll.on('scroll', (pos) => {
-            	this.scrollY = Math.abs(Math.round(pos.y))
+        created() {
+            this.classMap = ['decrease', 'discount', 'guarantee', 'invoice', 'special']
+            this.$http.get('/api/goods').then((response) => {
+                response = response.body
+                console.log(response)
+                if (response.errno === ERR_OK) {
+                    this.goods = response.data
+                    this.$nextTick(() => {
+                        this._initScroll()
+                        this._calculateHeight()
+                    })
+                }
             })
         },
-        _calculateHeight() {
-            let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook')
-            let height = 0
-            this.listHeight.push(height)
-            for (let i = 0; i < foodList.length; i++) {
-            	let item = foodList[i]
-                height += item.clientHeight
+
+        methods: {
+            _initScroll() {
+                this.menuScroll = new BScroll(this.$refs.menuWrapper, {
+                    click: true
+                })
+                this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
+                    click: true,
+                    probeType: 3
+                })
+                this.foodsScroll.on('scroll', (pos) => {
+                    this.scrollY = Math.abs(Math.round(pos.y))
+                })
+            },
+            _calculateHeight() {
+                let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook')
+                let height = 0
                 this.listHeight.push(height)
+                for (let i = 0; i < foodList.length; i++) {
+                    let item = foodList[i]
+                    height += item.clientHeight
+                    this.listHeight.push(height)
+                }
+            },
+            selectMenu(index, event) {
+                if (!event._constructed) {
+                    return
+                }
+                let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook')
+                let el = foodList[index]
+                this.foodsScroll.scrollToElement(el, 300)
+                console.log(index)
+                console.log(event)
             }
         },
-        selectMenu(index, event) {
-        	if (!event._constructed) {
-        		return
-            }
-            let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook')
-            let el = foodList[index]
-            this.foodsScroll.scrollToElement(el, 300)
-        	console.log(index)
-            console.log(event)
-        }
-      },
 
-      components: {
-      	shopcart, cartcontrol
-      }
+        components: {
+            shopcart, cartcontrol
+        }
     }
 </script>
 
